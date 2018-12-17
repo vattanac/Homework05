@@ -14,7 +14,7 @@ class Article :Mappable{
     var title:String!
     var imageUrl:String!
     var description:String!
-    //var author:String?
+    var Id:Int!
     
     required init?(map: Map) {
         
@@ -24,6 +24,7 @@ class Article :Mappable{
         title <- map["TITLE"]
         imageUrl  <- map["IMAGE"]
         description <- map["DESCRIPTION"]
+        Id <- map["ID"]
     }
     
     

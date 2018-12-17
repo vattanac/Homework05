@@ -32,17 +32,12 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
        
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete{
-            articleList.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .bottom)
-        }
-    }
+  
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as! TableViewCell
-        
-        cell.titleArticle.text =  articleList[indexPath.row].title
+//        print("*****\(articleList[indexPath.row].Id)")
+        cell.titleArticle.text =  articleList[indexPath.row].title ?? "no title"
         cell.authorArticle.text = "Tom Johnasy"
         
         
@@ -50,24 +45,15 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
                 articleList[indexPath.row].description = "no description"
             }
         
-//       if articleList[indexPath.row].imageUrl == "string" || articleList[indexPath.row].imageUrl == ""{
-//            articleList[indexPath.row].imageUrl = "http://www.markweb.in/primehouseware/images/noimage.png"
-//            //print("yyeeee")
-//        }
-        
+        cell.hidenlabel.text = String(articleList[indexPath.row].Id)
         cell.desArticle.text = articleList[indexPath.row].description //?? "No description"
-        let arch = "https://stackoverflow.com/questions/26364914/http-request-in-swift-with-post-method"
-        var imageString = articleList[indexPath.row].imageUrl ?? "http://www.markweb.in/primehouseware/images/noimage.png"
-        if imageString == "string" || imageString == nil || imageString == arch  {
-            imageString = "http://www.markweb.in/primehouseware/images/noimage.png"
-        }
+    
+        let imageString = articleList[indexPath.row].imageUrl ?? "http://www.markweb.in/primehouseware/images/noimage.png"
+        let url = URL(string: imageString)
+        let data = try! Data(contentsOf: url!)
+        let image = UIImage(data: data)
+        cell.ImageArticle.image = image
         print(imageString)
-        //tableView.reloadData()
-        // let imageUrl = URL(string: imageString)
-        
-      //  cell.ImageArticle.image =  UIImage(data:try! Data(contentsOf: imageUrl!))
-        //print(articleList)
-        
         return cell
     }
     
@@ -78,13 +64,40 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
     func postData(){
      
     }
-    func deleteData(){
-         let url = "http://api-ams.me/v1/api/articles"
+    
+    //MARK: SwapeRowToDelete
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as! TableViewCell
+        if editingStyle == .delete{
+              print("Delete on ID:\(articleList[indexPath.row].Id!)")
+            //let deletid = Int(cell.hidenlabel.text!)
+            let t =  articleList[indexPath.row].Id
+            deleteData(id: t!)
+             articleList.remove(at: indexPath.row)
+            
+         
+            tableView.deleteRows(at: [indexPath], with: .bottom)
+        }
+    }
+    
+    func deleteData(id:Int){
+         let url = "http://api-ams.me/v1/api/articles/" + String(id)
          let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
         
-        Alamofire.request(url, method: .delete, headers: header).responseData { (<#DataResponse<Data>#>) in
-            <#code#>
+        Alamofire.request(url, method: .delete, headers: header).responseJSON { (response) in
+           
+            guard response.result.error == nil else {
+                // got an error in getting the data, need to handle it
+                print("error calling DELETE on /todos/1")
+                if let error = response.result.error {
+                    print("Error: \(error)")
+                }
+                return
+            }
+            print("DELETE ok")
+
         }
+        
     }
     
     func getData() -> [Article] {
@@ -106,10 +119,10 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
                 
                 for article in jsondata{
                     self.articleList.append(Article(JSON: article)!)
-                    
                     self.tableView.reloadData()
                 }
                 for i in self.articleList{
+                    print("%%%%\(i.Id!)")
 //
 //                    print("Title:\(i.title ?? "No_Title")")
 //                    print("Description:\(i.description ?? "No_Description")")
