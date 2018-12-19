@@ -47,13 +47,6 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r0h-jA-GEC">
-                                <rect key="frame" x="139" y="88" width="109" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -83,7 +76,6 @@
                 <outlet property="ImageArticle" destination="Qsy-Pn-JHf" id="Xs6-LF-8Ff"/>
                 <outlet property="authorArticle" destination="UBB-3p-HGU" id="0kX-lb-yiC"/>
                 <outlet property="desArticle" destination="oNt-Db-6Gh" id="kbT-4t-tZM"/>
-                <outlet property="hidenlabel" destination="r0h-jA-GEC" id="Dm8-eH-IeG"/>
                 <outlet property="titleArticle" destination="nz2-U5-0PP" id="3KU-p7-L6Y"/>
             </connections>
             <point key="canvasLocation" x="137.59999999999999" y="186.20689655172416"/>

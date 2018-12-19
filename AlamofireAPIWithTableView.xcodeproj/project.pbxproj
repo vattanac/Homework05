@@ -16,6 +16,8 @@
 		CB975C0B21C4D2CC00C072A1 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB975C0921C4D2CC00C072A1 /* TableViewCell.swift */; };
 		CB975C0C21C4D2CC00C072A1 /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB975C0A21C4D2CC00C072A1 /* TableViewCell.xib */; };
 		CB975C0E21C4DDA500C072A1 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB975C0D21C4DDA500C072A1 /* Article.swift */; };
+		CBF2010221C7847000476847 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF2010121C7847000476847 /* DetailViewController.swift */; };
+		CBF2010421C8071200476847 /* EditeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF2010321C8071200476847 /* EditeViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +33,8 @@
 		CB975C0921C4D2CC00C072A1 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		CB975C0A21C4D2CC00C072A1 /* TableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
 		CB975C0D21C4DDA500C072A1 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		CBF2010121C7847000476847 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		CBF2010321C8071200476847 /* EditeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditeViewController.swift; sourceTree = "<group>"; };
 		E5A96C3809B5DBE65D511909 /* Pods_AlamofireAPIWithTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AlamofireAPIWithTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -93,6 +97,8 @@
 				CB975C0921C4D2CC00C072A1 /* TableViewCell.swift */,
 				CB975C0A21C4D2CC00C072A1 /* TableViewCell.xib */,
 				CB975C0D21C4DDA500C072A1 /* Article.swift */,
+				CBF2010121C7847000476847 /* DetailViewController.swift */,
+				CBF2010321C8071200476847 /* EditeViewController.swift */,
 			);
 			path = AlamofireAPIWithTableView;
 			sourceTree = "<group>";
@@ -199,6 +205,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-AlamofireAPIWithTableView/Pods-AlamofireAPIWithTableView-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
@@ -207,6 +214,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
@@ -224,7 +232,9 @@
 			files = (
 				CB975C0E21C4DDA500C072A1 /* Article.swift in Sources */,
 				CB975C0B21C4D2CC00C072A1 /* TableViewCell.swift in Sources */,
+				CBF2010221C7847000476847 /* DetailViewController.swift in Sources */,
 				CB975BFA21C4D13900C072A1 /* ViewController.swift in Sources */,
+				CBF2010421C8071200476847 /* EditeViewController.swift in Sources */,
 				CB975BF821C4D13900C072A1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

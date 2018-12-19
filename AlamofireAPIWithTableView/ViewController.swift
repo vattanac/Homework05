@@ -9,19 +9,37 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import Kingfisher
+
 
 class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSource {
     
+    
     @IBOutlet weak var tableView: UITableView!
     var articleList = [Article]()
+    var pagenation = 1
+    static var article  : Article!
+    var refreshcontrol = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        getData()
+        getData(pagenation: pagenation)
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.reloadData()
+        tableView.refreshControl = refreshcontrol
+        refreshcontrol.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         
     }
+    
+    @objc func refreshData(){
+        articleList.removeAll()
+        pagenation = 1
+        getData(pagenation: pagenation)
+        tableView.reloadData()
+        refreshcontrol.endRefreshing()
+    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return articleList.count
@@ -29,63 +47,118 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
     
     
     override func viewWillAppear(_ animated: Bool) {
-       
+        getData(pagenation: pagenation)
     }
     
-  
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedProgram = articleList[indexPath.row]
+        let destinationVC = DetailViewController()
+        self.performSegue(withIdentifier: "detail", sender: self)
+        print("detail")
+
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let destination = segue.destination as? DetailViewController {
+            destination.article = articleList[(tableView.indexPathForSelectedRow?.row)!]
+        }
+    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as! TableViewCell
-//        print("*****\(articleList[indexPath.row].Id)")
+        
+        let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as!TableViewCell
         cell.titleArticle.text =  articleList[indexPath.row].title ?? "no title"
         cell.authorArticle.text = "Tom Johnasy"
         
         
-            if articleList[indexPath.row].description == nil || articleList[indexPath.row].description == "" {
-                articleList[indexPath.row].description = "no description"
-            }
+        if articleList[indexPath.row].description == nil || articleList[indexPath.row].description == "" {
+            articleList[indexPath.row].description = "no description"
+        }
         
-        cell.hidenlabel.text = String(articleList[indexPath.row].Id)
+//        cell.hidenlabel.text = String(articleList[indexPath.row].Id)
         cell.desArticle.text = articleList[indexPath.row].description //?? "No description"
-    
+        
         let imageString = articleList[indexPath.row].imageUrl ?? "http://www.markweb.in/primehouseware/images/noimage.png"
+        
+        //MARK: Kingfisher
         let url = URL(string: imageString)
-        let data = try! Data(contentsOf: url!)
-        let image = UIImage(data: data)
-        cell.ImageArticle.image = image
-        print(imageString)
+        cell.ImageArticle.kf.indicatorType = .activity
+        cell.ImageArticle.kf.setImage(
+            with: url,
+            placeholder: #imageLiteral(resourceName: "noimage"),
+            options: [
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.fade(1)),
+                .cacheOriginalImage
+            ])
         return cell
+        
     }
+    
+    //MARK:WillDisplayCell
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        let lastrow = articleList.count - 1
+        if lastrow == indexPath.row{
+            pagenation = pagenation + 1
+            getData(pagenation: pagenation)
+            tableView.insertRows(at: [indexPath], with: .fade)
+            
+        }
+    }
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 116
     }
     
     func postData(){
-     
+        
     }
+    
+    //MARK: swape to delete ROW
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let delete = UIContextualAction(style: .destructive, title: "delete") { (action, view , handler) in
+            
+            let idfordelete =  self.articleList[indexPath.row].Id
+            self.deleteData(id: idfordelete!)
+            
+            
+            self.articleList.remove(at: indexPath.row)
+            //                tableView.deleteRows(at: [indexPath], with: .fade)
+            handler(true)
+            
+            
+        }
+        let cofiguration = UISwipeActionsConfiguration(actions: [delete])
+        cofiguration.performsFirstActionWithFullSwipe = true
+        
+        return UISwipeActionsConfiguration(actions: [delete])
+    }
+    
+    
     
     //MARK: SwapeRowToDelete
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as! TableViewCell
-        if editingStyle == .delete{
-              print("Delete on ID:\(articleList[indexPath.row].Id!)")
-            //let deletid = Int(cell.hidenlabel.text!)
-            let t =  articleList[indexPath.row].Id
-            deleteData(id: t!)
-             articleList.remove(at: indexPath.row)
-            
-         
-            tableView.deleteRows(at: [indexPath], with: .bottom)
-        }
+        
+        //        if editingStyle == .delete{
+        //            print("Delete on ID:\(articleList[indexPath.row].Id!)")
+        //            //let deletid = Int(cell.hidenlabel.text!)
+        //            let t =  articleList[indexPath.row].Id
+        //            deleteData(id: t!)
+        //            articleList.remove(at: indexPath.row)
+        //
+        //
+        //            tableView.deleteRows(at: [indexPath], with: .bottom)
+        //        }
     }
     
     func deleteData(id:Int){
-         let url = "http://api-ams.me/v1/api/articles/" + String(id)
-         let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
+        let url = "http://api-ams.me/v1/api/articles/" + String(id)
+        let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
         
         Alamofire.request(url, method: .delete, headers: header).responseJSON { (response) in
-           
+            
             guard response.result.error == nil else {
                 // got an error in getting the data, need to handle it
                 print("error calling DELETE on /todos/1")
@@ -95,15 +168,13 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
                 return
             }
             print("DELETE ok")
-
         }
-        
     }
     
-    func getData() -> [Article] {
+    func getData(pagenation:Int) -> [Article] {
         
         //var myArray = [Article]()
-        let url = "http://api-ams.me/v1/api/articles"
+        let url = "http://api-ams.me/v1/api/articles?page=" + String(pagenation) + "&limit=15"
         let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
         
         Alamofire.request(url, method: .get
@@ -122,14 +193,11 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
                     self.tableView.reloadData()
                 }
                 for i in self.articleList{
-                    print("%%%%\(i.Id!)")
-//
-//                    print("Title:\(i.title ?? "No_Title")")
-//                    print("Description:\(i.description ?? "No_Description")")
-//                    print("Image:\(i.imageUrl ?? "No_Image_URL")")
+                   
                     
                 }
         }
+        
         return  self.articleList
     }
     

@@ -8,6 +8,7 @@ target 'AlamofireAPIWithTableView' do
 	pod 'Alamofire'
 	pod 'SwiftyJSON'
 	pod 'ObjectMapper'
+	pod 'Kingfisher'
 
   # Pods for AlamofireAPIWithTableView
 
