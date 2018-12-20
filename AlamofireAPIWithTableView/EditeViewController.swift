@@ -18,18 +18,12 @@ class EditeViewController: UIViewController{
     @IBOutlet weak var uploadTitle: UITextField!
     @IBOutlet weak var uploadDescription: UITextView!
    
+   static var article:Article?
+    
     var temImage:UIImage?
     var isSelectImage = false
-    
-    @IBAction func saveData(_ sender: Any) {
-        if isSelectImage {
-            uploadData(image: temImage!)
-            print("saved")
-        }
-        navigationController?.popToRootViewController(animated: true)
-    }
+
     static let shared = EditeViewController()
-    
     
     fileprivate var currentVC: UIViewController!
     
@@ -44,6 +38,42 @@ class EditeViewController: UIViewController{
         uploadImage.isUserInteractionEnabled = true
         uploadImage.addGestureRecognizer(singleTap)
         
+        
+        AddorUpdate()
+    }
+    
+    func AddorUpdate(){
+        if EditeViewController.article == nil {
+            print("you want to add")
+        }else{
+            let url = URL(string: (EditeViewController.article?.imageUrl)!)
+            let data = try! Data(contentsOf: url!)
+            let image = UIImage(data: data)
+            uploadImage.image = image
+            uploadDescription.text = EditeViewController.article?.description
+            uploadTitle.text = EditeViewController.article?.title
+        }
+    }
+    
+    @IBAction func saveData(_ sender: Any) {
+        if EditeViewController.article == nil {
+            if isSelectImage {
+                uploadData(image: temImage!)
+                print("saved")
+            }
+        }else{
+            let id = EditeViewController.article?.Id
+            
+            let url = URL(string: (EditeViewController.article?.imageUrl)!)
+            print("on edit\(url)")
+            let data = try! Data(contentsOf: url!)
+            let image = UIImage(data: data)
+        
+            print("IDDDDDDDD:\(id)")
+            updateData(image:  temImage ?? image!  , id: id!)
+        }
+        
+        navigationController?.popToRootViewController(animated: true)
     }
     
     //Action
@@ -120,6 +150,53 @@ extension EditeViewController: UIImagePickerControllerDelegate, UINavigationCont
             isSelectImage = false
         }
         self.dismiss(animated: true, completion: nil)
+    }
+    //http://api-ams.me/v1/api/articles/
+    func updateData(image:UIImage,id:Int){
+        let url = "http://api-ams.me/v1/api/uploadfile/single"
+        let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ=",
+                      "Content-Type":"application/json",
+                      "Accept": "application/json"]
+        
+        Alamofire.upload(multipartFormData: { (form) in
+            form.append(image.jpegData(compressionQuality: 0.1)!, withName: "FILE", fileName : ".jpg", mimeType: "image/jpeg")
+        }, to: url, encodingCompletion: { result in
+            switch result {
+            case .success(let upload, _, _):
+                upload.responseJSON { response in
+                    guard response.result.isSuccess else{
+                        print("error")
+                        return
+                    }
+                    
+                    let json = response.result.value as! [String:Any]
+                    let imageurlgenerated = json["DATA"]
+                    print(imageurlgenerated!)
+                    
+                    let parameter : Parameters = [
+                        "TITLE": self.uploadTitle.text,
+                        "DESCRIPTION": self.uploadDescription.text ,
+                        "IMAGE": imageurlgenerated!
+                    ]
+                    
+                    let  urlupload = "http://api-ams.me/v1/api/articles/" + String(id)
+                    let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
+                    
+                    Alamofire.request(urlupload, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: header).responseJSON(completionHandler: { (response) in
+                        guard response.result.isSuccess else{
+                            print("error")
+                            return
+                        }
+                    })
+                    
+                    
+                    
+                }
+            case .failure(let encodingError):
+                print(encodingError)
+            }
+        })
+        
     }
     
     func uploadData(image:UIImage){

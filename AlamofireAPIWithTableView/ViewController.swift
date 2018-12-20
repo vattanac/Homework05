@@ -64,11 +64,15 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
         }
     }
     
+    @IBAction func AddButton(_ sender: Any) {
+        
+        self.performSegue(withIdentifier: "add", sender: self)
+    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = Bundle.main.loadNibNamed("TableViewCell", owner: self, options: nil)?.first as!TableViewCell
         cell.titleArticle.text =  articleList[indexPath.row].title ?? "no title"
-        cell.authorArticle.text = "Tom Johnasy"
+        cell.authorArticle.text = "kok dara"
         
         
         if articleList[indexPath.row].description == nil || articleList[indexPath.row].description == "" {
@@ -128,7 +132,6 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
             //                tableView.deleteRows(at: [indexPath], with: .fade)
             handler(true)
             
-            
         }
         let cofiguration = UISwipeActionsConfiguration(actions: [delete])
         cofiguration.performsFirstActionWithFullSwipe = true
@@ -136,23 +139,23 @@ class ViewController: UIViewController, UITableViewDelegate,UITableViewDataSourc
         return UISwipeActionsConfiguration(actions: [delete])
     }
     
-    
-    
-    //MARK: SwapeRowToDelete
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let edit = UIContextualAction(style: .normal, title: "edit") { (action, view , handler) in
+            
+          self.performSegue(withIdentifier: "add", sender: self)
+
+            
+            EditeViewController.article = self.articleList[indexPath.row]
+           
+            
+        }
+        let cofiguration = UISwipeActionsConfiguration(actions: [edit])
+        cofiguration.performsFirstActionWithFullSwipe = true
         
-        //        if editingStyle == .delete{
-        //            print("Delete on ID:\(articleList[indexPath.row].Id!)")
-        //            //let deletid = Int(cell.hidenlabel.text!)
-        //            let t =  articleList[indexPath.row].Id
-        //            deleteData(id: t!)
-        //            articleList.remove(at: indexPath.row)
-        //
-        //
-        //            tableView.deleteRows(at: [indexPath], with: .bottom)
-        //        }
+        return UISwipeActionsConfiguration(actions: [edit])
     }
     
+   
     func deleteData(id:Int){
         let url = "http://api-ams.me/v1/api/articles/" + String(id)
         let header = ["Authorization": "Basic QU1TQVBJQURNSU46QU1TQVBJUEBTU1dPUkQ="]
